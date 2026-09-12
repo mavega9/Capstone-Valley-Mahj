@@ -1,12 +1,12 @@
 /* ==========================================================================
    GIT 414 Capstone Production CSS Architecture
-   Topic: Valley Mahj Co.
+   Valley Mahj Co.
    ========================================================================== */
 
-/* 1. LAYER MANAGEMENT & CASCADE STRATEGY */
+/*  LAYER MANAGEMENT & CASCADE STRATEGY */
 @layer reset, base, layout, components, utilities, states, overrides, print;
 
-/* 2. RESET LAYER */
+/*  RESET LAYER */
 @layer reset {
   *, *::before, *::after {
     box-sizing: border-box;
@@ -18,10 +18,10 @@
   }
 }
 
-/* 3. BASE LAYER & DESIGN TOKENS */
+/*  BASE LAYER & DESIGN TOKENS */
 @layer base {
   :root {
-    /* Color Tokens (Figma Palette) */
+    /* Color Tokens */
     --color-bg-page: #FAF7F2;
     --color-bg-surface:#F0DCE6;
     --color-surface-blush: #F0DCE6;
@@ -73,33 +73,31 @@
   }
 
   img {
-    max-width: 100%;
-    height: auto;
+    max-inline-size: 100%;
+    block-size: auto;
     display: block;
   }
 }
 
-/* 4. LAYOUT ARCHITECTURE */
+/*  LAYOUT ARCHITECTURE */
 @layer layout {
-  main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: var(--space-xl) var(--space-md);
+  /* Responsive Layout Foundation (Logical Properties + Clamp) */
+  main, .wrapper {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-block: clamp(var(--space-md), 4vw, var(--space-xl));
+    padding-inline: var(--space-md);
   }
 
+  /*  Grid Layout 1 (Hero Intrinsic Grid with minmax) */
   .hero-container {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-xl);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: clamp(var(--space-md), 3vw, var(--space-xl));
     align-items: center;
   }
 
-  @media (min-width: 900px) {
-    .hero-container {
-      grid-template-columns: 1.1fr 0.9fr;
-    }
-  }
-
+  /*  Grid Layout 2 (Gallery Intrinsic Auto-Fit Grid) */
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -107,32 +105,34 @@
   }
 
   .table-container {
-    width: 100%;
+    inline-size: 100%;
     overflow-x: auto;
-    margin-bottom: var(--space-lg);
+    margin-block-end: var(--space-lg);
   }
 
   .stats-grid {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-xl);
-    margin-top: var(--space-xl);
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--color-ui-divider);
+    margin-block-start: var(--space-xl);
+    padding-block-start: var(--space-lg);
+    border-block-start: 1px solid var(--color-ui-divider);
   }
 }
 
-/* 5. COMPONENT PATTERNS */
+/*  COMPONENT PATTERNS */
 @layer components {
-  /* Pattern 1: Site Header & Navigation */
+  /*  Site Header & Nav Logical Property Update */
   .site-header {
     background: transparent;
-    border-bottom: 1px solid var(--color-ui-divider);
-    padding: var(--space-md);
+    border-block-end: 1px solid var(--color-ui-divider);
+    padding-block: var(--space-md);
+    padding-inline: var(--space-md);
   }
 
   .header-inner {
-    max-width: 1100px;
-    margin: 0 auto;
+    max-inline-size: 1100px;
+    margin-inline:  auto;
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
@@ -164,30 +164,31 @@
 
   .nav-link {
     color: var(--color-text-main);
-    padding: var(--space-xs) var(--space-sm);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-sm);
     border-radius: var(--radius-sm);
     text-decoration: none;
     font-weight: 600;
   }
 
-  /* Pattern 2: Hero & Banner Typography */
+  /*  Hero & Banner Typography */
   .eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.15em;
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--color-cta-primary);
-    margin-bottom: var(--space-sm);
+    margin-block-end: var(--space-sm);
     font-family: var(--font-heading-secondary);
   }
 
   .hero-headline {
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-style: italic;
-    margin-bottom: var(--space-md);
+    margin-block-end: var(--space-md);
   }
 
-  /* Pattern 3: Cards & Image Frames */
+  /*  Cards & Image Frames */
   .card {
     --card-bg: var(--color-white);
     --card-border: var(--color-ui-divider);
@@ -214,16 +215,49 @@
     justify-content: space-between;
     font-size: 0.75rem;
     color: var(--color-text-muted);
-    margin-top: var(--space-xs);
+    margin-block-start: var(--space-xs);
     font-style: italic;
   }
+.card-container {
+    container-type: inline-size;
+    container-name: card-container;
+    inline-size: 100%;
+  }
+/* Feature Query & Glassmorphism Fallback */
+  .glass-card {
+    background-color: var(--color-white); /* Fallback for older browsers */
+  }
 
-  /* Pattern 4: Forms & Input Grouping */
+  @supports (backdrop-filter: blur(10px)) {
+    .glass-card {
+      background-color: rgba(250, 247, 242, 0.75);
+      backdrop-filter: blur(10px);
+    }
+  }
+  /* Subgrid Support with fallback */
+  @supports (grid-template-rows: subgrid) {
+    .gallery-grid .card {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 3;
+    }
+  }
+
+  /* Container Query Layout Switch */
+  @container card-container (min-width: 480px) {
+    .card--promotional {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      align-items: center;
+      gap: var(--space-md);
+    }
+  }
+  /* Forms & Input Grouping */
   .form-group {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    margin-bottom: var(--space-md);
+    margin-block-end: var(--space-md);
   }
 
   .form-label {
@@ -233,18 +267,20 @@
   }
 
   .form-input {
-    padding: var(--space-xs) var(--space-sm);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-sm);
     border: 1px solid var(--color-ui-divider);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-base);
-    width: 100%;
+    inline-size: 100%;
   }
 
-  /* Pattern 5: Buttons & Call to Actions */
+  /*  Buttons & Call to Actions */
   .btn-terracotta {
     background-color: var(--color-cta-primary);
     color: var(--color-white);
-    padding: var(--space-xs) var(--space-md);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-md);
     border-radius: var(--radius-sm);
     font-weight: 600;
     font-size: 0.85rem;
@@ -254,13 +290,15 @@
     display: inline-block;
     border: none;
     cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
   }
 
   .btn-outline {
     background-color: transparent;
     border: 1px solid var(--color-text-main);
     color: var(--color-text-main);
-    padding: var(--space-xs) var(--space-md);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-md);
     border-radius: var(--radius-sm);
     font-weight: 600;
     font-size: 0.85rem;
@@ -268,6 +306,7 @@
     letter-spacing: 0.05em;
     text-decoration: none;
     display: inline-block;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   /* Stats Components */
@@ -291,19 +330,19 @@
     background: var(--color-text-main);
     color: var(--color-white);
     text-align: center;
-    padding: var(--space-lg);
-    margin-top: var(--space-xl);
+    padding-block: var(--space-lg);
+    margin-block-start: var(--space-xl);
   }
 }
 
-/* 6. UTILITIES */
+/*  UTILITIES */
 @layer utilities {
   .text-center { text-align: center; }
   
   .sr-only {
     position: absolute;
-    width: 1px;
-    height: 1px;
+    inline-size: 1px;
+    block-size: 1px;
     padding: 0;
     margin: -1px;
     overflow: hidden;
@@ -312,7 +351,7 @@
   }
 }
 
-/* 7. INTERACTIVE & ACCESSIBILITY STATES */
+/* INTERACTIVE & ACCESSIBILITY STATES */
 @layer states {
   .nav-link:hover,
   .nav-link[aria-current="page"] {
@@ -337,8 +376,26 @@
     outline-offset: var(--focus-offset);
   }
 }
+/* USER PREFERENCE QUERIES (Reduced Motion & Dark Mode) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
-/* 8. PRINT SUPPORT */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-page: #1F1B1A;
+    --color-text-main: #FAF7F2;
+    --color-text-muted: #D0C7C3;
+    --color-white: #2C2623;
+    --color-ui-divider: #3D3532;
+  }
+}
+/*  PRINT SUPPORT */
 @layer print {
   @media print {
     body {
@@ -354,7 +411,7 @@
     }
 
     main {
-      max-width: 100%;
+      max-inline-size: 100%;
       padding: 0;
     }
   }
