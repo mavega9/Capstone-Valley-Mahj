@@ -375,6 +375,32 @@
     outline: var(--focus-ring);
     outline-offset: var(--focus-offset);
   }
+  /* ==========================================
+   Pop-Up Events Map Section
+   ========================================== */
+#event-map {
+  margin: var(--space-lg, 2rem) 0;
+  padding: var(--space-md, 1rem);
+  text-align: center;
+}
+
+#event-map h3 {
+  font-family: var(--font-heading, serif);
+  margin-bottom: var(--space-sm, 0.75rem);
+}
+
+#event-map iframe {
+  width: 100%;
+  max-width: 1100px;
+  height: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#event-map p {
+  margin-top: var(--space-sm, 0.5rem);
+  font-size: 0.9rem;
+}
 }
 /* USER PREFERENCE QUERIES (Reduced Motion & Dark Mode) */
 @media (prefers-reduced-motion: reduce) {
